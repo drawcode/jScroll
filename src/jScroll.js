@@ -36,146 +36,146 @@
 * @link http://www.teamddm.com
 * @version 1.4.0
 */
-(function($) {
+(function ($) {
 
-	$.fn.jScroll = function() {
-		var customOptions = {},
+    $.fn.jScroll = function () {
+        var customOptions = {},
 			action = "scroll";
 
-		//Determine what action we should be taking.
-		if(typeof arguments[0] === "string") {
-			action = arguments[0];
-			customOptions = arguments[1];
-		} else {
-			customOptions = arguments[0];
-		}
+        //Determine what action we should be taking.
+        if (typeof arguments[0] === "string") {
+            action = arguments[0];
+            customOptions = arguments[1];
+        } else {
+            customOptions = arguments[0];
+        }
 
-		var options = $.extend($.fn.jScroll.defaultOptions, customOptions);
-		return this.each(function() {
-			var scroll=$(this).data('iscroll');
-			if(scroll){//If the iScroll already created, check action
-				if(action === "refresh"){
-					scroll.refresh();
-				}
-				if(action === "remove" || options.remove === true) {
-					remove_scroller(this);
-				}
-				//if use force action, this force to remove the actual scroll and create it again
-				if(action === "force") {
-					remove_scroller(this);
-					add_scroller(this, options);
-				}
-				if(action === "run" && typeof arguments[1] === "function"){
-					arguments[1](scroll);
-				}
-			} else if(is_ios_5() && !options.forceIscroll) {//If we're on iOS 5 we can use native scrolling.
-				var type = "";
-				if(options.hScroll && !options.vScroll) {
-					type = "horizontal";
-				} else if(!options.hScroll && options.vScroll) {
-					type = "vertical";
-				} else {
-					type = "both";
-				}
+        var options = $.extend($.fn.jScroll.defaultOptions, customOptions);
+        return this.each(function () {
+            var scroll = $(this).data('iscroll');
+            if (scroll) {//If the iScroll already created, check action
+                if (action === "refresh") {
+                    scroll.refresh();
+                }
+                if (action === "remove" || options.remove === true) {
+                    remove_scroller(this);
+                }
+                //if use force action, this force to remove the actual scroll and create it again
+                if (action === "force") {
+                    remove_scroller(this);
+                    add_scroller(this, options);
+                }
+                if (action === "run" && typeof arguments[1] === "function") {
+                    arguments[1](scroll);
+                }
+            } else if (is_ios_5() && !options.forceIscroll) {//If we're on iOS 5 we can use native scrolling.
+                var type = "";
+                if (options.hScroll && !options.vScroll) {
+                    type = "horizontal";
+                } else if (!options.hScroll && options.vScroll) {
+                    type = "vertical";
+                } else {
+                    type = "both";
+                }
 
-				if(action === "remove" || options.remove === true) {
-					remove_native_scroller(this, type);
-				} else {
-					add_native_scroller(this, type);
-				}
-			} else if(action === "scroll") {
-				//if not scroll, create one.
-				add_scroller(this, options);
-			}
-		});
-	};
+                if (action === "remove" || options.remove === true) {
+                    remove_native_scroller(this, type);
+                } else {
+                    add_native_scroller(this, type);
+                }
+            } else if (action === "scroll") {
+                //if not scroll, create one.
+                add_scroller(this, options);
+            }
+        });
+    };
 
-	/* Default options - The same as creating an iScroll object with no parameters */
-	$.fn.jScroll.defaultOptions = {
-		hScroll : true,
-		vScroll : true,
-		hScrollbar : true,
-		vScrollbar : true,
-		fixedScrollbar : false,
-		fadeScrollbar : true,
-		hideScrollbar : true,
-		bounce : true,
-		momentum : true,
-		lockDirection : false,
-		forceIscroll : false,
-		zoom : false, //Pinch to zoom.
-		useTransition : false,  //Performance mode!
+    /* Default options - The same as creating an iScroll object with no parameters */
+    $.fn.jScroll.defaultOptions = {
+        hScroll: true,
+        vScroll: true,
+        hScrollbar: true,
+        vScrollbar: true,
+        fixedScrollbar: false,
+        fadeScrollbar: true,
+        hideScrollbar: true,
+        bounce: true,
+        momentum: true,
+        lockDirection: false,
+        forceIscroll: false,
+        zoom: false, //Pinch to zoom.
+        useTransition: false,  //Performance mode!
         mouseWheel: true,
         infiniteElements: '.scroller',
         //infiniteLimit: 2000,
         dataset: null,
         dataFiller: null,
         cacheSize: 50,
-		onBeforeScrollStart: function (e) {
-			var target = e.target;
-			while (target.nodeType !== 1) {
-				target = target.parentNode;
-			}
+        onBeforeScrollStart: function (e) {
+            var target = e.target;
+            while (target.nodeType !== 1) {
+                target = target.parentNode;
+            }
 
-			if (target.tagName !== 'SELECT' && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
-				e.preventDefault();
-			}
-		},
-		remove : false
-	};
+            if (target.tagName !== 'SELECT' && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+            }
+        },
+        remove: false
+    };
 
-	/* Private functions */
+    /* Private functions */
 
-	function add_native_scroller(that, type) {
-		$el = $(that);
-		if(type === "horizontal") {
-			$el.css("overflow-x", "scroll");
-		} else if(type === "vertical") {
-			$el.css("overflow-y", "scroll");
-		} else {
-			$el.css("overflow", "scroll");
-		}
+    function add_native_scroller(that, type) {
+        $el = $(that);
+        if (type === "horizontal") {
+            $el.css("overflow-x", "scroll");
+        } else if (type === "vertical") {
+            $el.css("overflow-y", "scroll");
+        } else {
+            $el.css("overflow", "scroll");
+        }
 
-		$el.css("-webkit-overflow-scrolling", "touch");
-	}
+        $el.css("-webkit-overflow-scrolling", "touch");
+    }
 
-	function add_scroller(that, options) {
-		var scroll;
-		//setTimeout(function() {
-			scroll = new iScroll(that, $.extend(options, {run:false}));
-			$(that).data('iscroll',scroll);
-		//},100);
-		//if declared function run in the options, execute it after create the iScroll
-		if(typeof options.run=='function') options.run(scroll);
-	}
+    function add_scroller(that, options) {
+        var scroll;
+        //setTimeout(function() {
+        scroll = new IScroll(that, $.extend(options, { run: false }));
+        $(that).data('iscroll', scroll);
+        //},100);
+        //if declared function run in the options, execute it after create the iScroll
+        if (typeof options.run == 'function') options.run(scroll);
+    }
 
-	function is_ios_5() {
-		var ios5 = navigator.userAgent.match(/OS 5_[0-9_]+ like Mac OS X/i) != null;
-		if(ios5) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    function is_ios_5() {
+        var ios5 = navigator.userAgent.match(/OS 5_[0-9_]+ like Mac OS X/i) != null;
+        if (ios5) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	function remove_native_scroller(that, type) {
-		$el = $(that);
-		if(type === "horizontal") {
-			$el.css("overflow-x", "");
-		} else if(type === "vertical") {
-			$el.css("overflow-y", "");
-		} else {
-			$el.css("overflow", "");
-		}
-		$el.css("-webkit-overflow-scrolling", "");
-	}
+    function remove_native_scroller(that, type) {
+        $el = $(that);
+        if (type === "horizontal") {
+            $el.css("overflow-x", "");
+        } else if (type === "vertical") {
+            $el.css("overflow-y", "");
+        } else {
+            $el.css("overflow", "");
+        }
+        $el.css("-webkit-overflow-scrolling", "");
+    }
 
-	function remove_scroller(that) {
-		var scroll = $(that).data('iscroll');
-		if(scroll){
-			scroll.destroy();
-			$(that).data('iscroll',null);
-		}
-	}
+    function remove_scroller(that) {
+        var scroll = $(that).data('iscroll');
+        if (scroll) {
+            scroll.destroy();
+            $(that).data('iscroll', null);
+        }
+    }
 
 })(jQuery);
