@@ -105,6 +105,12 @@
 		forceIscroll : false,
 		zoom : false, //Pinch to zoom.
 		useTransition : false,  //Performance mode!
+        mouseWheel: true,
+        infiniteElements: '.scroller',
+        //infiniteLimit: 2000,
+        dataset: null,
+        dataFiller: null,
+        cacheSize: 50,
 		onBeforeScrollStart: function (e) {
 			var target = e.target;
 			while (target.nodeType !== 1) {
